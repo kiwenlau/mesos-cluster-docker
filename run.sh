@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MASTER_IP=192.168.59.1
-SLAVE_IP=(192.168.59.2, 192.168.59.3)
+SLAVE_IP=(192.168.59.2 192.168.59.3)
 INTERFACE=eth1
 
 # delete all containers on all nodes
@@ -19,7 +19,7 @@ sudo docker -H tcp://$MASTER_IP:4000 run --net=host \
                                          -itd \
                                          --name=mesos-master \
                                          -e "INTERFACE=$INTERFACE" \
-                                         kiwenlau/mesos supervisord --configuration=/etc/supervisor/conf.d/mesos-master.conf > /dev/null
+                                         kiwenlau/mesos:0.26.0 supervisord --configuration=/etc/supervisor/conf.d/mesos-master.conf > /dev/null
 
 
 # start mesos slave container
@@ -33,7 +33,7 @@ for (( i = 0; i < ${#SLAVE_IP[@]}; i++ )); do
                                                       --privileged \
                                                       --name=mesos-slave$i \
                                                       -e "MASTER_IP=$MASTER_IP" \
-                                                      kiwenlau/mesos supervisord --configuration=/etc/supervisor/conf.d/mesos-aurora-slave.conf > /dev/null
+                                                      kiwenlau/mesos:0.26.0 supervisord --configuration=/etc/supervisor/conf.d/mesos-slave.conf > /dev/null
 done
 
 
