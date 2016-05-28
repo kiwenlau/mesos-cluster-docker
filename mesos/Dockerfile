@@ -36,5 +36,3 @@ ADD mesos-slave.conf /etc/supervisor/conf.d/mesos-slave.conf
 # Install ZooKeeper
 RUN sudo apt-get install -y zookeeperd
 
-# sudo docker build -t kiwenlau/mesos-aurora .
-
