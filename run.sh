@@ -4,8 +4,10 @@ MASTER_IP=192.168.59.1
 SLAVE_IP=(192.168.59.2 192.168.59.3)
 INTERFACE=eth1
 
+echo -e "\n"
+
 # delete all containers on all nodes
-echo -e "\ndelete all containers on all nodes..."
+echo -e "delete all containers on all nodes..."
 sudo docker -H tcp://$MASTER_IP:2375 rm -f $(sudo docker -H tcp://$MASTER_IP:2375 ps -aq) > /dev/null
 for (( i = 0; i < ${#SLAVE_IP[@]}; i++ )); do
         sudo docker -H tcp://${SLAVE_IP[$i]}:2375 rm -f $(sudo docker -H tcp://${SLAVE_IP[$i]}:2375 ps -aq) > /dev/null
@@ -18,7 +20,7 @@ echo "start zookeeper container..."
 sudo docker -H tcp://$MASTER_IP:2375 run -itd \
                                          --net=host \
                                          --name=zookeeper \
-                                         kiwenlau/zookeeper > /dev/null
+                                         kiwenlau/zookeeper:3.4.8 > /dev/null
 
 # start mesos master container 
 echo "start mesos master container..."
@@ -26,7 +28,7 @@ sudo docker -H tcp://$MASTER_IP:2375 run -itd \
                                          --net=host \
                                          -e "INTERFACE=$INTERFACE" \
                                          --name=mesos-master \
-                                         kiwenlau/mesos:0.26.0 supervisord --configuration=/etc/supervisor/conf.d/mesos-master.conf > /dev/null
+                                         kiwenlau/mesos:0.26.0 start-mesos-master.sh > /dev/null
 
 
 # start mesos slave container
@@ -40,7 +42,7 @@ for (( i = 0; i < ${#SLAVE_IP[@]}; i++ )); do
                                                       -e "MASTER_IP=$MASTER_IP" \
                                                       -e "INTERFACE=$INTERFACE" \
                                                       --name=mesos-slave$i \
-                                                      kiwenlau/mesos:0.26.0 supervisord --configuration=/etc/supervisor/conf.d/mesos-slave.conf > /dev/null
+                                                      kiwenlau/mesos:0.26.0 start-mesos-slave.sh > /dev/null
 done
 
 
@@ -55,5 +57,5 @@ for (( i = 0; i < 120; i++ )); do
         fi
 done
 
-echo ""
+echo -e "\n"
 

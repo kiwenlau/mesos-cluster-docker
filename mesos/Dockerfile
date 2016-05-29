@@ -8,7 +8,7 @@ RUN sudo echo "Asia/Tokyo" > /etc/timezone && \
 
 WORKDIR /root
 
-RUN apt-get update && apt-get install -y supervisor wget vim nfs-common moreutils curl  
+RUN apt-get update && apt-get install -y wget vim moreutils
 
 # install docker
 RUN wget -qO- https://get.docker.com/ | sh
@@ -30,9 +30,8 @@ RUN wget -c http://downloads.mesosphere.io/master/ubuntu/14.04/mesos_0.26.0-0.2.
     sudo dpkg -i mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb && \
     rm mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb 
 
-ADD mesos-master.conf /etc/supervisor/conf.d/mesos-master.conf
-ADD mesos-slave.conf /etc/supervisor/conf.d/mesos-slave.conf
+COPY start-mesos-master.sh /usr/local/bin/start-mesos-master.sh
+COPY start-mesos-slave.sh /usr/local/bin/start-mesos-slave.sh
 
-# Install ZooKeeper
-RUN sudo apt-get install -y zookeeperd
+RUN chmod +x /usr/local/bin/start-mesos-master.sh /usr/local/bin/start-mesos-slave.sh
 
