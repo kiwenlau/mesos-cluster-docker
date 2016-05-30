@@ -8,10 +8,7 @@ RUN sudo echo "Asia/Tokyo" > /etc/timezone && \
 
 WORKDIR /root
 
-RUN apt-get update && apt-get install -y wget vim moreutils
-
-# install docker
-RUN wget -qO- https://get.docker.com/ | sh
+RUN apt-get update && apt-get install -y curl moreutils
 
 # Install Java 8 from Oracle's PPA
 RUN  sudo apt-get install -y software-properties-common && \
@@ -21,14 +18,15 @@ RUN  sudo apt-get install -y software-properties-common && \
      sudo apt-get install -y oracle-java8-installer oracle-java8-set-default
 
 # install mesos 0.26.0
-RUN sudo apt-get install -y software-properties-common && \
+RUN sudo apt-get update && sudo apt-get install -y software-properties-common libsvn1 libcurl3 && \
     sudo add-apt-repository ppa:openjdk-r/ppa -y && \
     sudo apt-get update && \
-    sudo apt-get install -y software-properties-common wget libsvn1 libcurl3
-
-RUN wget -c http://downloads.mesosphere.io/master/ubuntu/14.04/mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb && \
+    curl -O http://downloads.mesosphere.io/master/ubuntu/14.04/mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb && \
     sudo dpkg -i mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb && \
     rm mesos_0.26.0-0.2.145.ubuntu1404_amd64.deb 
+
+# install docker 1.11.1
+RUN curl -fLsS https://get.docker.com/ | sed 's/docker-engine/docker-engine=1.11.1-0~trusty/' | sh
 
 COPY start-mesos-master.sh /usr/local/bin/start-mesos-master.sh
 COPY start-mesos-slave.sh /usr/local/bin/start-mesos-slave.sh
