@@ -8,3 +8,4 @@ mesos-master --ip=$LOCAL_IP \
              --work_dir=/var/lib/mesos \
              --log_dir=/log/mesos \
              --hostname_lookup=false
+

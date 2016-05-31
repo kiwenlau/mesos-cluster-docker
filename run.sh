@@ -27,7 +27,7 @@ echo "start mesos master container..."
 sudo docker -H tcp://$MASTER_IP:2375 run -itd \
                                          --net=host \
                                          -e "INTERFACE=$INTERFACE" \
-                                         --name=mesos-master \
+                                         --name=master \
                                          kiwenlau/mesos:0.26.0 start-mesos-master.sh > /dev/null
 
 
@@ -38,13 +38,17 @@ for (( i = 0; i < ${#SLAVE_IP[@]}; i++ )); do
                                                       --net=host \
                                                       --pid=host \
                                                       -v /var/run/docker.sock:/var/run/docker.sock \
+                                                      -v /sys:/sys \
+                                                      -v /tmp/mesos:/tmp/mesos \
                                                       --privileged \
                                                       -e "MASTER_IP=$MASTER_IP" \
                                                       -e "INTERFACE=$INTERFACE" \
-                                                      --name=mesos-slave$i \
+                                                      --name=slave$i \
                                                       kiwenlau/mesos:0.26.0 start-mesos-slave.sh > /dev/null
 done
 
+                                                      # -v /tmp/mesos:/tmp/mesos \
+                                                      # 
 
 # check the status of Mesos/Aurora cluster
 echo -e "\nchecking the status of mesos cluster, please wait..."
